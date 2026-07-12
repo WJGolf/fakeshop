@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ลงขายของฉัน — ตลาดนัดออนไลน์</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ต</span>
+      <span class="brand-text">ตลาดนัดออนไลน์<small>ซื้อง่าย ขายคล่อง ในที่เดียว</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" data-static>หน้าร้าน</a>
+      <a href="sell.html" class="primary" data-static>+ ลงขายของฉัน</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page-hero">
+    <p class="eyebrow">แผงขายของฉัน</p>
+    <h1>จองแผงขายของ</h1>
+    <p>กรอกรายละเอียดสินค้าของคุณ เมื่อส่งแล้วคำขอจะถูกส่งไปให้แอดมินตรวจสอบก่อนขึ้นแสดงในหน้าร้าน</p>
+  </section>
+
+  <div class="form-card">
+    <div class="alert" id="alertBox"></div>
+
+    <form id="sellForm">
+      <div class="field">
+        <label for="productName">ชื่อสินค้า *</label>
+        <input type="text" id="productName" required maxlength="120" placeholder="เช่น เสื้อยืดลายการ์ตูน">
+      </div>
+
+      <div class="field">
+        <label>รูปสินค้า</label>
+        <div class="file-drop" id="fileDrop">
+          📷 คลิกเพื่อเลือกรูปสินค้า (สูงสุด 5MB)
+          <input type="file" id="imageInput" accept="image/*">
+        </div>
+        <div class="file-preview" id="filePreview"></div>
+      </div>
+
+      <div class="field">
+        <label for="productDescription">รายละเอียดสินค้า</label>
+        <textarea id="productDescription" maxlength="1000" placeholder="สภาพสินค้า ขนาด สี วิธีใช้งาน ฯลฯ"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="productPrice">ราคา (บาท) *</label>
+          <input type="number" id="productPrice" required min="0" step="0.01" placeholder="0.00">
+        </div>
+        <div class="field">
+          <label for="productQuantity">จำนวนที่มีขาย *</label>
+          <input type="number" id="productQuantity" required min="1" step="1" value="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="categorySelect">หมวดหมู่ *</label>
+        <select id="categorySelect" required>
+          <option value="" disabled selected>กำลังโหลดหมวดหมู่...</option>
+        </select>
+      </div>
+
+      <hr class="receipt-divider">
+
+      <div class="field-row">
+        <div class="field">
+          <label for="sellerName">ชื่อผู้ขาย *</label>
+          <input type="text" id="sellerName" required maxlength="80" placeholder="ชื่อ-นามสกุล หรือชื่อร้าน">
+        </div>
+        <div class="field">
+          <label for="sellerContact">ช่องทางติดต่อ *</label>
+          <input type="text" id="sellerContact" required maxlength="120" placeholder="เบอร์โทร / Line ID">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">ส่งคำขอลงขาย</button>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">ตลาดนัดออนไลน์ · ขับเคลื่อนด้วย Supabase</div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/sell.js"></script>
+</body>
+</html>

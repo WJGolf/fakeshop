@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตลาดนัดออนไลน์ — หน้าร้าน</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ต</span>
+      <span class="brand-text">ตลาดนัดออนไลน์<small>ซื้อง่าย ขายคล่อง ในที่เดียว</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" data-static>หน้าร้าน</a>
+      <a href="sell.html" class="primary" data-static>+ ลงขายของฉัน</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page-hero">
+    <p class="eyebrow">แผงขายของทุกคน</p>
+    <h1>เลือกซื้อของจากพ่อค้าแม่ค้าในตลาด</h1>
+    <p>สินค้าที่แสดงในหน้านี้ผ่านการตรวจสอบและอนุมัติจากแอดมินแล้วทุกชิ้น</p>
+  </section>
+
+  <div class="chip-row" id="chipRow"></div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+    <span id="resultCount" style="color:var(--ink-soft); font-size:14px;"></span>
+  </div>
+
+  <div class="product-grid" id="productGrid">
+    <div class="loading-line">กำลังโหลดสินค้า...</div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">ตลาดนัดออนไลน์ · ขับเคลื่อนด้วย Supabase</div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/store.js"></script>
+</body>
+</html>

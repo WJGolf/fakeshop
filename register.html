@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สมัครสมาชิก — ตลาดนัดออนไลน์</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ต</span>
+      <span class="brand-text">ตลาดนัดออนไลน์<small>ซื้อง่าย ขายคล่อง ในที่เดียว</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" data-static>หน้าร้าน</a>
+      <a href="sell.html" class="primary" data-static>+ ลงขายของฉัน</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding-top:40px;">
+  <div class="form-card narrow">
+    <p class="eyebrow" style="text-align:center;">เข้าร่วมตลาดนัด</p>
+    <h1 style="font-family:var(--font-display); font-size:24px; text-align:center; margin-top:0; color:var(--teal-900);">สมัครสมาชิก</h1>
+
+    <div class="alert" id="alertBox"></div>
+
+    <form id="registerForm">
+      <div class="field">
+        <label for="displayName">ชื่อที่แสดง *</label>
+        <input type="text" id="displayName" required maxlength="80" placeholder="ชื่อเล่น หรือชื่อร้าน">
+      </div>
+      <div class="field">
+        <label for="phone">เบอร์โทร / Line ID</label>
+        <input type="text" id="phone" maxlength="120" placeholder="ไว้ให้ผู้ซื้อติดต่อ (แก้ทีหลังได้)">
+      </div>
+      <div class="field">
+        <label for="email">อีเมล *</label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">รหัสผ่าน *</label>
+        <input type="password" id="password" required minlength="6" placeholder="อย่างน้อย 6 ตัวอักษร">
+      </div>
+      <div class="field">
+        <label for="passwordConfirm">ยืนยันรหัสผ่าน *</label>
+        <input type="password" id="passwordConfirm" required minlength="6" placeholder="พิมพ์รหัสผ่านอีกครั้ง">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="registerBtn">สมัครสมาชิก</button>
+      <p class="hint" style="text-align:center; margin-top:14px;">มีบัญชีอยู่แล้ว? <a href="login.html" style="color:var(--teal-700); font-weight:600;">เข้าสู่ระบบ</a></p>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">ตลาดนัดออนไลน์ · ขับเคลื่อนด้วย Supabase</div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/register.js"></script>
+</body>
+</html>

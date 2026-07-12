@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โปรไฟล์ของฉัน — ตลาดนัดออนไลน์</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ต</span>
+      <span class="brand-text">ตลาดนัดออนไลน์<small>ซื้อง่าย ขายคล่อง ในที่เดียว</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" data-static>หน้าร้าน</a>
+      <a href="sell.html" class="primary" data-static>+ ลงขายของฉัน</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page-hero">
+    <p class="eyebrow">บัญชีของฉัน</p>
+    <h1>โปรไฟล์ของฉัน</h1>
+    <p>แก้ไขข้อมูลติดต่อ และดูสินค้าที่คุณเคยลงขาย</p>
+  </section>
+
+  <div class="form-card" style="max-width:100%; display:grid; grid-template-columns: 1fr 1.4fr; gap:28px;">
+    <div>
+      <div class="alert" id="alertBox"></div>
+
+      <form id="profileForm">
+        <div class="field">
+          <label>อีเมล</label>
+          <input type="text" id="emailReadonly" disabled>
+        </div>
+        <div class="field">
+          <label>ตำแหน่ง</label>
+          <input type="text" id="roleReadonly" disabled>
+        </div>
+        <div class="field">
+          <label for="displayName">ชื่อที่แสดง</label>
+          <input type="text" id="displayName" maxlength="80">
+        </div>
+        <div class="field">
+          <label for="phone">เบอร์โทร / Line ID</label>
+          <input type="text" id="phone" maxlength="120" placeholder="ไว้ให้ผู้ซื้อติดต่อ">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="saveBtn">บันทึกการเปลี่ยนแปลง</button>
+      </form>
+    </div>
+
+    <div>
+      <h3 style="font-family:var(--font-display); color:var(--teal-900); margin-top:0;">สินค้าที่ฉันเคยลงขาย</h3>
+      <div id="myListings">
+        <div class="loading-line">กำลังโหลด...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">ตลาดนัดออนไลน์ · ขับเคลื่อนด้วย Supabase</div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

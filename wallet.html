@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>กระเป๋าเงินของฉัน — ตลาดนัดออนไลน์</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ต</span>
+      <span class="brand-text">ตลาดนัดออนไลน์<small>ซื้อง่าย ขายคล่อง ในที่เดียว</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" data-static>หน้าร้าน</a>
+      <a href="sell.html" class="primary" data-static>+ ลงขายของฉัน</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="page-hero">
+    <p class="eyebrow">บัญชีของฉัน</p>
+    <h1>กระเป๋าเงินของฉัน</h1>
+    <p>เติมเงินเข้ากระเป๋า ดูสถานะคำสั่งซื้อ และรายการขายของคุณ</p>
+  </section>
+
+  <div class="balance-card">
+    <div class="label">ยอดเงินคงเหลือ</div>
+    <div class="amount" id="balanceAmount">0 บาท</div>
+  </div>
+
+  <div class="chip-row">
+    <button class="chip active wallet-tab" data-panel="panel-topup">เติมเงิน</button>
+    <button class="chip wallet-tab" data-panel="panel-orders">คำสั่งซื้อของฉัน</button>
+    <button class="chip wallet-tab" data-panel="panel-sales">ยอดขายของฉัน</button>
+  </div>
+
+  <!-- เติมเงิน -->
+  <section class="wallet-panel" id="panel-topup">
+    <div class="form-card" style="max-width:100%;">
+      <div class="qr-box">
+        <!-- แก้ src ด้านล่างให้เป็นไฟล์รูปคิวอาร์โค้ดจริงของร้าน เช่น assets/qr-code.jpg -->
+        <img src="assets/qr-code.jpg" alt="คิวอาร์โค้ดสำหรับโอนเงิน" onerror="this.style.display='none'">
+        <p class="hint">สแกนคิวอาร์โค้ดด้านบนเพื่อโอนเงิน แล้วแนบสลิปด้านล่างเพื่อส่งคำขอเติมเงิน</p>
+      </div>
+
+      <div class="alert" id="topupAlertBox"></div>
+
+      <form id="topupForm">
+        <div class="field">
+          <label>สลิปการโอนเงิน *</label>
+          <div class="file-drop" id="slipDrop">
+            🧾 คลิกเพื่อเลือกรูปสลิป (สูงสุด 5MB)
+            <input type="file" id="slipInput" accept="image/*">
+          </div>
+          <div class="file-preview" id="slipPreview"></div>
+        </div>
+
+        <div class="field">
+          <label for="topupNote">หมายเหตุ (ถ้ามี)</label>
+          <input type="text" id="topupNote" maxlength="200" placeholder="เช่น เวลาที่โอน หรือยอดที่โอน">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="topupSubmitBtn">ส่งคำขอเติมเงิน</button>
+      </form>
+    </div>
+
+    <h3 style="font-family:var(--font-display); color:var(--teal-900); margin:26px 0 12px;">ประวัติการเติมเงิน</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>สลิป</th>
+            <th>ยอดเงิน</th>
+            <th>สถานะ</th>
+            <th>หมายเหตุจากแอดมิน</th>
+          </tr>
+        </thead>
+        <tbody id="myTopupsBody">
+          <tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- คำสั่งซื้อของฉัน -->
+  <section class="wallet-panel" id="panel-orders" style="display:none;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>สินค้า</th>
+            <th>จำนวน</th>
+            <th>ยอดรวม</th>
+            <th>สถานะ</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="myOrdersBody">
+          <tr><td colspan="6" class="loading-line">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ยอดขายของฉัน -->
+  <section class="wallet-panel" id="panel-sales" style="display:none;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>สินค้า</th>
+            <th>จำนวน</th>
+            <th>ยอดรวม</th>
+            <th>สถานะ</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="mySalesBody">
+          <tr><td colspan="6" class="loading-line">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">ตลาดนัดออนไลน์ · ขับเคลื่อนด้วย Supabase</div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/wallet.js"></script>
+</body>
+</html>

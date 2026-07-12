@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เข้าสู่ระบบ — ตลาดนัดออนไลน์</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ต</span>
+      <span class="brand-text">ตลาดนัดออนไลน์<small>ซื้อง่าย ขายคล่อง ในที่เดียว</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" data-static>หน้าร้าน</a>
+      <a href="sell.html" class="primary" data-static>+ ลงขายของฉัน</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding-top:60px;">
+  <div class="form-card narrow">
+    <p class="eyebrow" style="text-align:center;">ยินดีต้อนรับกลับ</p>
+    <h1 style="font-family:var(--font-display); font-size:24px; text-align:center; margin-top:0; color:var(--teal-900);">เข้าสู่ระบบ</h1>
+
+    <div class="alert" id="alertBox"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">อีเมล</label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">รหัสผ่าน</label>
+        <input type="password" id="password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn">เข้าสู่ระบบ</button>
+      <p class="hint" style="text-align:center; margin-top:14px;">ยังไม่มีบัญชี? <a href="register.html" style="color:var(--teal-700); font-weight:600;">สมัครสมาชิก</a></p>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">ตลาดนัดออนไลน์ · ขับเคลื่อนด้วย Supabase</div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>
