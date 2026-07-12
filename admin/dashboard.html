@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>หลังร้าน — ตลาดนัดออนไลน์</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <span class="brand-text">🛡️ หลังร้าน</span>
+    <button data-tab="panel-pending" class="active">รออนุมัติ</button>
+    <button data-tab="panel-products">สินค้าทั้งหมด</button>
+    <button data-tab="panel-topups">เติมเงิน</button>
+    <button data-tab="panel-orders">คำสั่งซื้อ</button>
+    <button data-tab="panel-categories">หมวดหมู่</button>
+    <button data-tab="panel-members" id="membersTabBtn" style="display:none;">สมาชิก</button>
+    <div style="flex:1;"></div>
+    <a href="../index.html" style="margin-bottom:6px;">← กลับหน้าร้าน</a>
+    <button id="logoutBtn">ออกจากระบบ</button>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h2>แผงควบคุมแอดมิน</h2>
+        <span style="color:var(--ink-soft); font-size:13.5px;" id="adminEmailLabel"></span>
+        <span class="role-badge" id="adminRoleBadge"></span>
+      </div>
+      <a href="../index.html" class="btn btn-outline btn-small" target="_blank">ดูหน้าร้าน ↗</a>
+    </div>
+
+    <!-- Pending approvals -->
+    <section class="admin-panel" id="panel-pending">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>รูป</th>
+              <th>สินค้า</th>
+              <th>ราคา/จำนวน</th>
+              <th>ผู้ขาย</th>
+              <th>สถานะ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="pendingTableBody">
+            <tr><td colspan="6" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- All products -->
+    <section class="admin-panel" id="panel-products" style="display:none;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>รูป</th>
+              <th>สินค้า</th>
+              <th>ราคา</th>
+              <th>จำนวน</th>
+              <th>สถานะ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <tr><td colspan="6" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Topups -->
+    <section class="admin-panel" id="panel-topups" style="display:none;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>สลิป</th>
+              <th>สมาชิก</th>
+              <th>หมายเหตุจากผู้โอน</th>
+              <th>วันที่ส่งคำขอ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="topupsTableBody">
+            <tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section class="admin-panel" id="panel-orders" style="display:none;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>สินค้า</th>
+              <th>ผู้ซื้อ</th>
+              <th>ผู้ขาย</th>
+              <th>ยอดรวม</th>
+              <th>สถานะ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <tr><td colspan="7" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="admin-panel" id="panel-categories" style="display:none;">
+      <div class="form-card" style="margin-bottom:24px; max-width:100%;">
+        <form id="addCategoryForm" style="display:flex; gap:12px; align-items:flex-end;">
+          <div class="field" style="flex:1; margin-bottom:0;">
+            <label for="newCategoryName">เพิ่มหมวดหมู่ใหม่</label>
+            <input type="text" id="newCategoryName" placeholder="เช่น เสื้อผ้า, ของใช้ในบ้าน" required>
+          </div>
+          <button type="submit" class="btn btn-primary">เพิ่ม</button>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ชื่อหมวดหมู่</th><th>จัดการ</th></tr>
+          </thead>
+          <tbody id="categoryTableBody">
+            <tr><td colspan="2" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Members / roles (owner only) -->
+    <section class="admin-panel" id="panel-members" style="display:none;">
+      <p class="hint" style="margin-bottom:16px;">เฉพาะ<strong>เจ้าของร้าน</strong>เท่านั้นที่สามารถเปลี่ยนตำแหน่งของสมาชิกได้ ผู้ใช้ทุกคนสมัครสมาชิกได้เองผ่านหน้า "สมัครสมาชิก"</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ชื่อที่แสดง</th>
+              <th>อีเมล</th>
+              <th>ตำแหน่งปัจจุบัน</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="membersTableBody">
+            <tr><td colspan="4" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../js/supabaseClient.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/admin-dashboard.js"></script>
+</body>
+</html>
