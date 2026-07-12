@@ -33,6 +33,7 @@ tabButtons.forEach((btn) => {
     if (btn.dataset.tab === "panel-pending") loadPending();
     if (btn.dataset.tab === "panel-products") loadAllProducts();
     if (btn.dataset.tab === "panel-topups") loadTopups();
+    if (btn.dataset.tab === "panel-withdrawals") loadWithdrawals();
     if (btn.dataset.tab === "panel-orders") loadOrders();
     if (btn.dataset.tab === "panel-categories") loadCategories();
     if (btn.dataset.tab === "panel-members") loadMembers();
@@ -368,6 +369,88 @@ async function rejectTopup(id, slipPath) {
   }
   toast("ปฏิเสธคำขอเรียบร้อยแล้ว", "success");
   loadTopups();
+}
+
+/* ---------- ถอนเงิน (withdrawals) ---------- */
+
+async function loadWithdrawals() {
+  const body = document.getElementById("withdrawalsTableBody");
+  body.innerHTML = `<tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>`;
+
+  const { data, error } = await supabaseClient
+    .from("withdrawals")
+    .select("id, bank_name, account_number, account_name, amount, created_at, profiles!withdrawals_user_id_fkey(display_name, email)")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    body.innerHTML = `<tr><td colspan="5">โหลดข้อมูลไม่สำเร็จ: ${escapeHtml(error.message)}</td></tr>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    body.innerHTML = `<tr><td colspan="5">ไม่มีคำขอถอนเงินที่รออนุมัติ 🎉</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = data
+    .map(
+      (w) => `
+      <tr>
+        <td>${escapeHtml(w.profiles?.display_name || "-")}<br><span style="color:var(--ink-soft); font-size:12.5px;">${escapeHtml(w.profiles?.email || "")}</span></td>
+        <td>${escapeHtml(w.bank_name)}<br><span style="color:var(--ink-soft); font-size:12.5px;">${escapeHtml(w.account_number)} · ${escapeHtml(w.account_name)}</span></td>
+        <td>${formatBaht(w.amount)}</td>
+        <td>${new Date(w.created_at).toLocaleString("th-TH")}</td>
+        <td class="action-group">
+          <button class="btn btn-primary btn-small" data-approve-withdrawal="${w.id}">โอนเงินแล้ว / อนุมัติ</button>
+          <button class="btn btn-danger btn-small" data-reject-withdrawal="${w.id}">ปฏิเสธ</button>
+        </td>
+      </tr>`
+    )
+    .join("");
+
+  body.querySelectorAll("[data-approve-withdrawal]").forEach((btn) =>
+    btn.addEventListener("click", () => approveWithdrawal(btn.dataset.approveWithdrawal))
+  );
+  body.querySelectorAll("[data-reject-withdrawal]").forEach((btn) =>
+    btn.addEventListener("click", () => rejectWithdrawal(btn.dataset.rejectWithdrawal))
+  );
+}
+
+async function approveWithdrawal(id) {
+  const ok = await confirmModal({
+    title: "ยืนยันการอนุมัติถอนเงิน",
+    message: "ยืนยันว่าคุณได้โอนเงินไปยังบัญชีของสมาชิกเรียบร้อยแล้ว?",
+    confirmText: "ยืนยัน อนุมัติ",
+    icon: "🏦",
+  });
+  if (!ok) return;
+
+  const { error } = await supabaseClient.rpc("approve_withdrawal", { p_withdrawal_id: id });
+  if (error) {
+    toast("อนุมัติไม่สำเร็จ: " + error.message, "error");
+    return;
+  }
+  toast("อนุมัติคำขอถอนเงินเรียบร้อยแล้ว", "success");
+  loadWithdrawals();
+}
+
+async function rejectWithdrawal(id) {
+  const result = await formModal({
+    title: "ปฏิเสธคำขอถอนเงิน",
+    message: "เงินจะถูกคืนเข้ากระเป๋าของสมาชิกโดยอัตโนมัติ",
+    fields: [{ id: "reason", label: "เหตุผลที่ปฏิเสธ (ถ้ามี)", type: "textarea", placeholder: "เช่น ข้อมูลบัญชีไม่ถูกต้อง" }],
+    confirmText: "ปฏิเสธคำขอ",
+  });
+  if (result === null) return;
+
+  const { error } = await supabaseClient.rpc("reject_withdrawal", { p_withdrawal_id: id, p_note: result.reason || null });
+  if (error) {
+    toast("ปฏิเสธไม่สำเร็จ: " + error.message, "error");
+    return;
+  }
+  toast("ปฏิเสธคำขอเรียบร้อยแล้ว เงินถูกคืนเข้ากระเป๋าสมาชิกแล้ว", "success");
+  loadWithdrawals();
 }
 
 /* ---------- คำสั่งซื้อ (orders) ---------- */
