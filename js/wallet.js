@@ -16,6 +16,11 @@ const topupAlertBox = document.getElementById("topupAlertBox");
 const tabButtons = document.querySelectorAll(".wallet-tab");
 const panels = document.querySelectorAll(".wallet-panel");
 
+const withdrawForm = document.getElementById("withdrawForm");
+const withdrawSubmitBtn = document.getElementById("withdrawSubmitBtn");
+const withdrawAlertBox = document.getElementById("withdrawAlertBox");
+const withdrawableBalanceEl = document.getElementById("withdrawableBalance");
+
 let currentCtx = null;
 let selectedSlipFile = null;
 
@@ -29,6 +34,7 @@ const ORDER_STATUS_LABEL = {
 };
 
 const TOPUP_STATUS_LABEL = { pending: "รออนุมัติ", approved: "อนุมัติแล้ว", rejected: "ปฏิเสธแล้ว" };
+const WITHDRAWAL_STATUS_LABEL = { pending: "รออนุมัติ", approved: "โอนเงินแล้ว", rejected: "ปฏิเสธแล้ว (คืนเงินแล้ว)", cancelled: "ยกเลิกแล้ว (คืนเงินแล้ว)" };
 
 function showTopupAlert(message, type = "error") {
   topupAlertBox.textContent = message;
@@ -45,6 +51,7 @@ tabButtons.forEach((btn) => {
     document.getElementById(btn.dataset.panel).style.display = "block";
 
     if (btn.dataset.panel === "panel-topup") loadMyTopups();
+    if (btn.dataset.panel === "panel-withdraw") loadMyWithdrawals();
     if (btn.dataset.panel === "panel-orders") loadMyOrders();
     if (btn.dataset.panel === "panel-sales") loadMySales();
   });
@@ -166,6 +173,140 @@ async function loadMyTopups() {
   body.innerHTML = data.map(topupRowHtml).join("");
 }
 
+/* ---------- Withdraw form ---------- */
+
+function showWithdrawAlert(message, type = "error") {
+  withdrawAlertBox.textContent = message;
+  withdrawAlertBox.className = `alert show alert-${type}`;
+}
+
+withdrawForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  withdrawAlertBox.className = "alert";
+
+  const bankName = document.getElementById("withdrawBankName").value.trim();
+  const accountNumber = document.getElementById("withdrawAccountNumber").value.trim();
+  const accountName = document.getElementById("withdrawAccountName").value.trim();
+  const amount = Number(document.getElementById("withdrawAmount").value);
+
+  if (!bankName || !accountNumber || !accountName || !amount || amount <= 0) {
+    showWithdrawAlert("กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง");
+    return;
+  }
+
+  if (amount > Number(currentCtx.profile.wallet_balance || 0)) {
+    showWithdrawAlert("ยอดเงินในกระเป๋าไม่เพียงพอสำหรับการถอนครั้งนี้");
+    return;
+  }
+
+  const ok = await confirmModal({
+    title: "ยืนยันการถอนเงิน",
+    message: `ถอนเงิน <strong>${formatBaht(amount)}</strong> เข้าบัญชี <strong>${escapeHtml(bankName)}</strong><br>เลขที่บัญชี ${escapeHtml(accountNumber)}<br>ระบบจะหักยอดจากกระเป๋าทันที รอแอดมินตรวจสอบและโอนเงินให้`,
+    confirmText: "ยืนยันถอนเงิน",
+    icon: "🏦",
+  });
+  if (!ok) return;
+
+  withdrawSubmitBtn.disabled = true;
+  withdrawSubmitBtn.textContent = "กำลังส่งคำขอ...";
+
+  const { error } = await supabaseClient.rpc("request_withdrawal", {
+    p_bank_name: bankName,
+    p_account_number: accountNumber,
+    p_account_name: accountName,
+    p_amount: amount,
+  });
+
+  withdrawSubmitBtn.disabled = false;
+  withdrawSubmitBtn.textContent = "ส่งคำขอถอนเงิน";
+
+  if (error) {
+    showWithdrawAlert("ส่งคำขอไม่สำเร็จ: " + error.message);
+    return;
+  }
+
+  withdrawForm.reset();
+  showWithdrawAlert("ส่งคำขอถอนเงินเรียบร้อยแล้ว! รอแอดมินตรวจสอบและโอนเงินให้", "success");
+
+  // อัปเดตยอดคงเหลือที่แสดงบนหน้าให้ตรงกับที่ถูกหักไปแล้ว
+  currentCtx.profile.wallet_balance = Number(currentCtx.profile.wallet_balance) - amount;
+  balanceAmountEl.textContent = formatBaht(currentCtx.profile.wallet_balance);
+  withdrawableBalanceEl.textContent = formatBaht(currentCtx.profile.wallet_balance);
+
+  loadMyWithdrawals();
+});
+
+function withdrawalRowHtml(w) {
+  const actionHtml =
+    w.status === "pending"
+      ? `<button class="btn btn-outline btn-small" data-cancel-withdrawal="${w.id}">ยกเลิก</button>`
+      : "-";
+  return `
+    <tr>
+      <td>${new Date(w.created_at).toLocaleString("th-TH")}</td>
+      <td>${escapeHtml(w.bank_name)}<br><span style="color:var(--ink-soft); font-size:12.5px;">${escapeHtml(w.account_number)}</span></td>
+      <td>${formatBaht(w.amount)}</td>
+      <td><span class="status-badge status-${w.status}">${WITHDRAWAL_STATUS_LABEL[w.status] || w.status}</span></td>
+      <td>${escapeHtml(w.admin_note || "-")}</td>
+      <td>${actionHtml}</td>
+    </tr>`;
+}
+
+async function loadMyWithdrawals() {
+  withdrawableBalanceEl.textContent = formatBaht(currentCtx.profile.wallet_balance);
+
+  const body = document.getElementById("myWithdrawalsBody");
+  body.innerHTML = `<tr><td colspan="6" class="loading-line">กำลังโหลด...</td></tr>`;
+
+  const { data, error } = await supabaseClient
+    .from("withdrawals")
+    .select("id, bank_name, account_number, amount, status, admin_note, created_at")
+    .eq("user_id", currentCtx.user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    body.innerHTML = `<tr><td colspan="6">โหลดข้อมูลไม่สำเร็จ: ${escapeHtml(error.message)}</td></tr>`;
+    return;
+  }
+  if (!data || data.length === 0) {
+    body.innerHTML = `<tr><td colspan="6">ยังไม่มีประวัติการถอนเงิน</td></tr>`;
+    return;
+  }
+  body.innerHTML = data.map(withdrawalRowHtml).join("");
+
+  body.querySelectorAll("[data-cancel-withdrawal]").forEach((btn) =>
+    btn.addEventListener("click", () => cancelWithdrawal(btn.dataset.cancelWithdrawal))
+  );
+}
+
+async function cancelWithdrawal(id) {
+  const ok = await confirmModal({
+    title: "ยกเลิกคำขอถอนเงิน",
+    message: "ยืนยันยกเลิกคำขอถอนเงินนี้? ระบบจะคืนเงินเข้ากระเป๋าให้ทันที",
+    confirmText: "ยกเลิกคำขอ",
+    danger: true,
+    icon: "↩️",
+  });
+  if (!ok) return;
+
+  const { error } = await supabaseClient.rpc("cancel_own_withdrawal", { p_withdrawal_id: id });
+  if (error) {
+    toast("ยกเลิกไม่สำเร็จ: " + error.message, "error");
+    return;
+  }
+
+  toast("ยกเลิกคำขอถอนเงินเรียบร้อยแล้ว เงินถูกคืนเข้ากระเป๋าแล้ว", "success");
+
+  // รีเฟรชยอดเงินจากฐานข้อมูลจริงให้ตรงเป๊ะ
+  const ctx = await getCurrentProfile();
+  if (ctx) {
+    currentCtx.profile.wallet_balance = ctx.profile.wallet_balance;
+    balanceAmountEl.textContent = formatBaht(currentCtx.profile.wallet_balance);
+  }
+
+  loadMyWithdrawals();
+}
+
 /* ---------- My orders (as buyer) / My sales (as seller) ---------- */
 
 function orderRowHtml(o, role) {
@@ -282,6 +423,7 @@ async function requestCancel(id) {
 
   await renderAuthNav(document.getElementById("navLinks"), "");
   balanceAmountEl.textContent = formatBaht(currentCtx.profile.wallet_balance);
+  withdrawableBalanceEl.textContent = formatBaht(currentCtx.profile.wallet_balance);
 
   await loadMyTopups();
 })();

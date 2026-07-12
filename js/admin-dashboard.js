@@ -34,6 +34,7 @@ tabButtons.forEach((btn) => {
     if (btn.dataset.tab === "panel-products") loadAllProducts();
     if (btn.dataset.tab === "panel-topups") loadTopups();
     if (btn.dataset.tab === "panel-withdrawals") loadWithdrawals();
+    if (btn.dataset.tab === "panel-password-resets") loadPasswordResets();
     if (btn.dataset.tab === "panel-orders") loadOrders();
     if (btn.dataset.tab === "panel-categories") loadCategories();
     if (btn.dataset.tab === "panel-members") loadMembers();
@@ -451,6 +452,108 @@ async function rejectWithdrawal(id) {
   }
   toast("ปฏิเสธคำขอเรียบร้อยแล้ว เงินถูกคืนเข้ากระเป๋าสมาชิกแล้ว", "success");
   loadWithdrawals();
+}
+
+/* ---------- คำขอรีเซ็ตรหัสผ่าน ---------- */
+
+async function loadPasswordResets() {
+  const body = document.getElementById("passwordResetsTableBody");
+  body.innerHTML = `<tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>`;
+
+  const { data, error } = await supabaseClient
+    .from("password_reset_requests")
+    .select("id, email, contact, note, created_at")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    body.innerHTML = `<tr><td colspan="5">โหลดข้อมูลไม่สำเร็จ: ${escapeHtml(error.message)}</td></tr>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    body.innerHTML = `<tr><td colspan="5">ไม่มีคำขอรีเซ็ตรหัสผ่านที่รอดำเนินการ 🎉</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = data
+    .map(
+      (r) => `
+      <tr>
+        <td>${escapeHtml(r.email)}</td>
+        <td>${escapeHtml(r.contact)}</td>
+        <td>${escapeHtml(r.note || "-")}</td>
+        <td>${new Date(r.created_at).toLocaleString("th-TH")}</td>
+        <td class="action-group">
+          <button class="btn btn-primary btn-small" data-set-password="${r.id}">ตั้งรหัสผ่านใหม่</button>
+          <button class="btn btn-danger btn-small" data-reject-reset="${r.id}">ปฏิเสธ</button>
+        </td>
+      </tr>`
+    )
+    .join("");
+
+  body.querySelectorAll("[data-set-password]").forEach((btn) =>
+    btn.addEventListener("click", () => resolvePasswordReset(btn.dataset.setPassword))
+  );
+  body.querySelectorAll("[data-reject-reset]").forEach((btn) =>
+    btn.addEventListener("click", () => rejectPasswordReset(btn.dataset.rejectReset))
+  );
+}
+
+async function resolvePasswordReset(id) {
+  const result = await formModal({
+    title: "ตั้งรหัสผ่านใหม่ให้สมาชิก",
+    message: "ตั้งรหัสผ่านชั่วคราวแล้วแจ้งกลับให้สมาชิกทางช่องทางที่ระบุไว้ในคำขอ",
+    fields: [{ id: "password", label: "รหัสผ่านใหม่", type: "text", placeholder: "อย่างน้อย 6 ตัวอักษร", required: true }],
+    confirmText: "ตั้งรหัสผ่าน",
+  });
+  if (!result) return;
+
+  if (!result.password || result.password.length < 6) {
+    toast("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร", "error");
+    return;
+  }
+
+  const ok = await confirmModal({
+    title: "ยืนยันการตั้งรหัสผ่านใหม่",
+    message: "ยืนยันตั้งรหัสผ่านนี้ให้บัญชีดังกล่าว? อย่าลืมติดต่อกลับไปแจ้งสมาชิกหลังจากนี้",
+    confirmText: "ยืนยัน ตั้งรหัสผ่าน",
+    icon: "🔑",
+  });
+  if (!ok) return;
+
+  const { error } = await supabaseClient.rpc("admin_resolve_password_reset", {
+    p_request_id: id,
+    p_new_password: result.password,
+  });
+
+  if (error) {
+    toast("ตั้งรหัสผ่านไม่สำเร็จ: " + error.message, "error");
+    return;
+  }
+  toast("ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว — อย่าลืมแจ้งสมาชิกทางช่องทางที่ระบุไว้", "success");
+  loadPasswordResets();
+}
+
+async function rejectPasswordReset(id) {
+  const result = await formModal({
+    title: "ปฏิเสธคำขอรีเซ็ตรหัสผ่าน",
+    fields: [{ id: "reason", label: "เหตุผลที่ปฏิเสธ (ถ้ามี)", type: "textarea", placeholder: "เช่น ยืนยันตัวตนไม่ได้" }],
+    confirmText: "ปฏิเสธคำขอ",
+  });
+  if (result === null) return;
+
+  const { error } = await supabaseClient.rpc("admin_reject_password_reset", {
+    p_request_id: id,
+    p_note: result.reason || null,
+  });
+
+  if (error) {
+    toast("ปฏิเสธไม่สำเร็จ: " + error.message, "error");
+    return;
+  }
+  toast("ปฏิเสธคำขอเรียบร้อยแล้ว", "success");
+  loadPasswordResets();
 }
 
 /* ---------- คำสั่งซื้อ (orders) ---------- */

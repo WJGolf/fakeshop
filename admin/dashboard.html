@@ -15,6 +15,7 @@
     <button data-tab="panel-products">สินค้าทั้งหมด</button>
     <button data-tab="panel-topups">เติมเงิน</button>
     <button data-tab="panel-withdrawals">ถอนเงิน</button>
+    <button data-tab="panel-password-resets">คำขอรีเซ็ตรหัสผ่าน</button>
     <button data-tab="panel-orders">คำสั่งซื้อ</button>
     <button data-tab="panel-categories">หมวดหมู่</button>
     <button data-tab="panel-members" id="membersTabBtn" style="display:none;">สมาชิก</button>
@@ -109,6 +110,26 @@
             </tr>
           </thead>
           <tbody id="withdrawalsTableBody">
+            <tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Password reset requests -->
+    <section class="admin-panel" id="panel-password-resets" style="display:none;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>อีเมล</th>
+              <th>ช่องทางติดต่อกลับ</th>
+              <th>หมายเหตุจากสมาชิก</th>
+              <th>วันที่ส่งคำขอ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="passwordResetsTableBody">
             <tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>
           </tbody>
         </table>
