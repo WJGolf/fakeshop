@@ -35,6 +35,7 @@
 
   <div class="chip-row">
     <button class="chip active wallet-tab" data-panel="panel-topup">เติมเงิน</button>
+    <button class="chip wallet-tab" data-panel="panel-withdraw">ถอนเงิน</button>
     <button class="chip wallet-tab" data-panel="panel-orders">คำสั่งซื้อของฉัน</button>
     <button class="chip wallet-tab" data-panel="panel-sales">ยอดขายของฉัน</button>
   </div>
@@ -83,6 +84,58 @@
         </thead>
         <tbody id="myTopupsBody">
           <tr><td colspan="5" class="loading-line">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ถอนเงิน -->
+  <section class="wallet-panel" id="panel-withdraw" style="display:none;">
+    <div class="form-card" style="max-width:100%;">
+      <p class="hint" style="margin-top:0; margin-bottom:16px;">กรอกบัญชีธนาคารที่ต้องการให้โอนเงินเข้า ระบบจะหักยอดจากกระเป๋าไว้ก่อนทันที รอแอดมินตรวจสอบและโอนเงินให้ ใช้เวลาไม่เกิน 1-2 วันทำการ</p>
+
+      <div class="alert" id="withdrawAlertBox"></div>
+
+      <form id="withdrawForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="withdrawBankName">ธนาคาร *</label>
+            <input type="text" id="withdrawBankName" required maxlength="80" placeholder="เช่น ธนาคารกสิกรไทย">
+          </div>
+          <div class="field">
+            <label for="withdrawAccountNumber">เลขที่บัญชี *</label>
+            <input type="text" id="withdrawAccountNumber" required maxlength="40" inputmode="numeric" placeholder="xxx-x-xxxxx-x">
+          </div>
+        </div>
+        <div class="field">
+          <label for="withdrawAccountName">ชื่อบัญชี *</label>
+          <input type="text" id="withdrawAccountName" required maxlength="120" placeholder="ชื่อ-นามสกุลเจ้าของบัญชี">
+        </div>
+        <div class="field">
+          <label for="withdrawAmount">จำนวนเงินที่ต้องการถอน (บาท) *</label>
+          <input type="number" id="withdrawAmount" required min="1" step="0.01" placeholder="0.00">
+          <p class="hint">ยอดคงเหลือที่ถอนได้: <span id="withdrawableBalance">0 บาท</span></p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="withdrawSubmitBtn">ส่งคำขอถอนเงิน</button>
+      </form>
+    </div>
+
+    <h3 style="font-family:var(--font-display); color:var(--teal-900); margin:26px 0 12px;">ประวัติการถอนเงิน</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>ธนาคาร / บัญชี</th>
+            <th>จำนวนเงิน</th>
+            <th>สถานะ</th>
+            <th>หมายเหตุจากแอดมิน</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="myWithdrawalsBody">
+          <tr><td colspan="6" class="loading-line">กำลังโหลด...</td></tr>
         </tbody>
       </table>
     </div>
